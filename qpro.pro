@@ -180,7 +180,7 @@ search_answer(Id):-
 search_answer(SentId):-
   distinct(SentId,search_answer0(SentId)).
 
-
+search_answer0(SentId):-match_ners(SentId).
 search_answer0(SentId):-distinct(match_relevant(SentId)).
 search_answer0(SentId):-distinct(match_edges(SentId)).
 search_answer0(SentId):-distinct(match_svo(SentId)).
@@ -351,33 +351,35 @@ cls_count(F/N,K):-functor(C,F,N),predicate_property(C, number_of_clauses(K)).
 
 % NER logic
 
-/*
-ner_query(S):-
+match_ners(S):-
   is_defined(ner/2),
-  findall(Ws,(query_rank(W,_),atom(W)),Ws0),
-  once((select(W,Ws0,Ws),wh_word(W))),
-*/
+  once((query_w2l(_,L,_),wh_word(L))),
+  findall(W,(query_w2l(W,_L,Tag),good_tag(Tag)),Ws),
+  writeln(Ws),
+  call(L,Ws,S).
+
 
 
 wh_word(where).
 wh_word(when).
+wh_word(who).
 wh_word(many).
 
 
-many(S):-many([_],S).
 
+who(S):-who([_],S).
+who(KWs,S):-wh(['PERSON','ORGANIZATION','TITLE'],KWs,S).
+
+many(S):-many([_],S).
 many(KWs,S):-wh(['NUMBER', 'ORDINAL', 'MONEY'],KWs,S).
 
 when(S):-when([_],S).
-
-when(KWs,S):-wh(['DATE','TIME'],KWs,S).
+when(KWs,S):-wh(['DATE','TIME','DURATION'],KWs,S).
 
 where(S):-where([_],S).
-
 where(KWs,S):-wh(['LOCATION','CITY','COUNTRY','STATE_OR_PROVINCE'],KWs,S).
 
 wh(Tags,S):-wh(Tags,[_],S).
-
 wh(Tags,KWs,S):-distinct(S,wh0(Tags,KWs,S)).
 
 wh0(Tags,KWs,S):-

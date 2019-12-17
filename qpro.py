@@ -455,7 +455,7 @@ def t1():
 def t2():
   # dialog_about('examples/bfr')
   dialog_about('examples/hindenburg',
-               "How did the  fire start on the Hindenburg?")
+               "When did the  fire start on the Hindenburg?")
 
 
 def t3():
