@@ -149,8 +149,8 @@ def getNERs(ws):
 # sends dependency triples to Prolog, as rececived from Parser  
 def triples_to_prolog(pref,qgm,f) :
     ctr=0
-    for g in qgm.gs :
-      for x in g.triples() :
+    for ts in qgm.triples() :
+      for x in ts:
         (fr,ft),r,(to,tt)=x
         print(pref+'dep',end='',file=f)
         print((ctr,fr,ft,r,to,tt),end='',file=f)
@@ -168,7 +168,7 @@ def sents_to_prolog(pref, qgm, f):
 
 
 def ners_to_prolog(pref, qgm, f):
-  if not toolkit=='stanfordnlp' :
+  if toolkit!='corenlp' :
     return
   s_ws_gen=enumerate(qgm.words())
   for s_ws in s_ws_gen:
@@ -342,7 +342,7 @@ def personalized_to_prolog(pref,gm,qgm,personalize,f) :
 # the empty prefix pref='' marks realtions describing a document
 def to_prolog(pref,gm,qgm,fNameNoSuf) :
   with open(fNameNoSuf+'.pro','w') as f :
-    #triples_to_prolog(pref,qgm,f)
+    triples_to_prolog(pref,qgm,f)
     #print(' ',file=f)
     edges_to_prolog(pref,qgm,f)    
     print(' ',file=f)
