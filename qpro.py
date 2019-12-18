@@ -13,6 +13,12 @@ from text_graph_crafts.parser_api import *
 toolkit='corenlp'
 #toolkit='stanfordnlp'
 
+# running from other directory -e.g. via a pip install
+def data_files() :
+  #where= "$HOME/Desktop/sit/TEXT_CRAFTS/DeepTalk/"
+  where = './'
+  return where
+
 def customGraphMaker() :
   if toolkit=='stanfordnlp':
     return dr.GraphMaker(api_classname=StanTorch_API)
@@ -73,7 +79,8 @@ def dialog_about(fNameNoSuf,question) :
     dr.print_summary(gm.bestSentences(sk))
 
   prolog = Prolog()
-  sink(prolog.query("consult('qpro.pro')"))
+  qpro=data_files()+'qpro.pro'
+  sink(prolog.query("consult('"+qpro+"')"))
   sink(prolog.query("load('"+fNameNoSuf+"')"))
   qgm=customGraphMaker()
 
@@ -95,8 +102,6 @@ def dialog_about(fNameNoSuf,question) :
   return process_log(log)
 
 def process_log(log) :
-  #print('LOG:', log)
-  #with open(logfile,'w') as lf :
   l=len(log)
   qa_log=dict()
   for i in range(l) :
