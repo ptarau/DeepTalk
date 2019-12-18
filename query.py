@@ -1,4 +1,3 @@
-import text_graph_crafts
 from text_graph_crafts.params import *
 from text_graph_crafts import deepRank as dr
 from collections import defaultdict

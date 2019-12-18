@@ -3,10 +3,13 @@ from pyswip.easy import *
 from graphviz import Digraph
 import subprocess
 from text_graph_crafts.params import *
-import text_graph_crafts
+
 from text_graph_crafts import deepRank as dr
 from text_graph_crafts.sim import *
 from text_graph_crafts.parser_api import *
+
+
+####  start config aprameters ######
 
 # we can change here the toolkit to be used
 
@@ -18,6 +21,27 @@ def data_files() :
   #where= "$HOME/Desktop/sit/TEXT_CRAFTS/DeepTalk/"
   where = './'
   return where
+#>>> import text_graph_crafts
+#
+#>>> text_graph_crafts.__file__
+# gives
+#...../__init__.py'
+# from here, if qpro.pro is located in the package
+# it can be loaded at runtime
+
+# alternatively, this
+# finds absolute file name of Prolog companion qpro.pro
+def pro() :
+  if __name__ == '__main__':
+    # assume we just test this locally on its own
+    return './qpro.pro'
+  else :
+    # assuming it is imported from a package and then run
+    # to test this - possibly adapt after setup done
+    f=__file__
+    return f[:len(f)-3]+".pro"
+
+####  end config aprameters ######
 
 def customGraphMaker() :
   if toolkit=='stanfordnlp':
@@ -79,8 +103,7 @@ def dialog_about(fNameNoSuf,question) :
     dr.print_summary(gm.bestSentences(sk))
 
   prolog = Prolog()
-  qpro=data_files()+'qpro.pro'
-  sink(prolog.query("consult('"+qpro+"')"))
+  sink(prolog.query("consult('" + pro() + "')"))
   sink(prolog.query("load('"+fNameNoSuf+"')"))
   qgm=customGraphMaker()
 
@@ -525,8 +548,10 @@ todo:
 
 remove: svo(x,rel,x)
 
-
 '''
+print('prolog companion',pro())
 
 if __name__ == '__main__'  :
   pass
+
+
