@@ -397,6 +397,32 @@ def to_prolog(pref,gm,qgm,fNameNoSuf) :
         keys_to_prolog(pref,10,qgm,f)
         print(' ',file=f)
 
+# turns a sequence/generator into a file, one line per item yield
+def seq2file(fname,seq) :
+  xs=map(str,seq)
+  ys=interleave_with('\n','\n',xs)
+  text=''.join(ys)
+  string2file(fname,text)
+
+# turns a file into a (string) generator yielding each of its lines
+def file2seq(fname) :
+   with open(fname,'r') as f :
+     for l in f : yield l.strip()
+
+# turns a string into given file
+def string2file(fname,text) :
+  with open(fname,'w') as f :
+    f.write(text)
+
+# turns content of file into a string
+def file2string(fname) :
+  with open(fname,'r') as f :
+    s = f.read()
+    return s.replace('-',' ')
+
+# interleaves list with separator
+def interleave(sep,xs) :
+  return interleave_with(sep,None,xs)
 
 def ptest():
   f = 'examples/bfr'
@@ -445,7 +471,7 @@ def pdf_quest(Folder, FNameNoSuf, QuestFileNoSuf):
 def txt_quest(Folder, FNameNoSuf, QuestFileNoSuf):
   Q = []
   qfname = Folder + "/" + QuestFileNoSuf + ".txt"
-  qs = list(ev.file2seq(qfname))
+  qs = list(file2seq(qfname))
   # print('qs',qs)
   return  dialog_about(Folder + "/" + FNameNoSuf, qs)
 
@@ -531,12 +557,6 @@ def t10():
                 about='What are the applications of TextRank? \
       How sentence extraction works? What is the role of PageRank?')
 
-
-def p1():
-  fd = ev.doc_dir
-  fn = "1039329"
-  fname = fd + fn
-  export_to_prolog(fname, fd + "pro/" + fn)
 
 
 ppp=print
