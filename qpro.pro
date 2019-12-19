@@ -351,6 +351,7 @@ cls_count(F/N,K):-functor(C,F,N),predicate_property(C, number_of_clauses(K)).
 
 % NER logic
 
+match_ners(S):-is_defined(match_custom_ners/1),match_custom_ners(S).
 match_ners(S):-
   is_defined(ner/2),
   once((query_w2l(_,L,_),wh_word(L))),
