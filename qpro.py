@@ -78,6 +78,7 @@ def go() :
 # generates Prolog facts dataset - depends on eval.py
 
 def gen_pro_dataset() :
+  import eval as ev
   fd=ev.doc_dir
   fs=ev.all_doc_files
   for path in fs :
@@ -434,18 +435,40 @@ def pdf_chat_with(Folder, FNameNoSuf, about=None):
   dr.pdf2txt(fname + ".pdf")
   return  dialog_about(fname, about)
 
+# turns a sequence/generator into a file, one line per item yield
+def seq2file(fname,seq) :
+  xs=map(str,seq)
+  ys=interleave_with('\n','\n',xs)
+  text=''.join(ys)
+  string2file(fname,text)
+
+# turns a file into a (string) generator yielding each of its lines
+def file2seq(fname) :
+   with open(fname,'r') as f :
+     for l in f : yield l.strip()
+
+# turns a string into given file
+def string2file(fname,text) :
+  with open(fname,'w') as f :
+    f.write(text)
+
+# turns content of file into a string
+def file2string(fname) :
+  with open(fname,'r') as f :
+    s = f.read()
+    return s.replace('-',' ')
 
 def pdf_quest(Folder, FNameNoSuf, QuestFileNoSuf):
   Q = []
   qfname = Folder + "/" + QuestFileNoSuf + ".txt"
-  qs = list(ev.file2seq(qfname))
+  qs = list(file2seq(qfname))
   return  pdf_chat_with(Folder, FNameNoSuf, about=qs)
 
 
 def txt_quest(Folder, FNameNoSuf, QuestFileNoSuf):
   Q = []
   qfname = Folder + "/" + QuestFileNoSuf + ".txt"
-  qs = list(ev.file2seq(qfname))
+  qs = list(file2seq(qfname))
   # print('qs',qs)
   return  dialog_about(Folder + "/" + FNameNoSuf, qs)
 
@@ -530,14 +553,6 @@ def t10():
   pdf_chat_with('pdfs', 'textrank',
                 about='What are the applications of TextRank? \
       How sentence extraction works? What is the role of PageRank?')
-
-
-def p1():
-  fd = ev.doc_dir
-  fn = "1039329"
-  fname = fd + fn
-  export_to_prolog(fname, fd + "pro/" + fn)
-
 
 ppp=print
 
