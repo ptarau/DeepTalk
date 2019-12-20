@@ -28,10 +28,10 @@ with open('requirements.txt') as f:
 with open("README.md","r") as f:
     long_description = f.read()
 
-version = "0.0.2_a"
+version = "0.0.4"
 setup(name='deep_talk',
   version=version,
-  description='DeepTalk Model: Python and Prolog based dialogue agent',
+  description='DeepTalk: Python and Prolog based dialogue agent',
   long_description = long_description,
   long_description_content_type='text/markdown',
   url='https://github.com/ptarau/DeepTalk.git',

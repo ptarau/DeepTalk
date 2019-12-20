@@ -1,1 +1,2 @@
-  include ./deep_talk/*.pro
+include ./requirements.txt
+include ./deep_talk/*.pro
