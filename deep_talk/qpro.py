@@ -2,11 +2,11 @@ from pyswip import *
 from pyswip.easy import *
 from graphviz import Digraph
 import subprocess
-from text_graph_crafts.params import *
+from textcrafts.params import *
 
-from text_graph_crafts import deepRank as dr
-from text_graph_crafts.sim import *
-from text_graph_crafts.parser_api import *
+from textcrafts import deepRank as dr
+from textcrafts.sim import *
+from textcrafts.parser_api import *
 
 
 ####  start config aprameters ######
@@ -158,11 +158,11 @@ def dialog_step(prolog,question,gm,qgm,fNameNoSuf,log) :
       for answer in answers :
         say(answer)
     print('')
-      
-   
+
+
 def sink(generator) :
   for _ in generator : pass
-  
+
 
 def getNERs(ws):
   from nltk.parse.corenlp import CoreNLPParser
@@ -173,8 +173,8 @@ def getNERs(ws):
       yield t
 
 
-      
-# sends dependency triples to Prolog, as rececived from Parser  
+
+# sends dependency triples to Prolog, as rececived from Parser
 def triples_to_prolog(pref,qgm,f) :
     ctr=0
     for ts in qgm.triples() :
@@ -209,22 +209,22 @@ def ners_to_prolog(pref, qgm, f):
 
 
 
-# sends summaries to Prolog    
+# sends summaries to Prolog
 def sums_to_prolog(pref,k,qgm,f) :
     if pref : return
     for sent in qgm.bestSentences(k) :
       print('summary',end='',file=f)
       print(sent,end='',file=f)
-      print('.',file=f)   
- 
-# sends keyphrases to Prolog    
+      print('.',file=f)
+
+# sends keyphrases to Prolog
 def keys_to_prolog(pref,k,qgm,f) :
     if pref : return
     for kw in qgm.bestWords(k) :
       print(pref+"keyword('",end='',file=f)
       print(kw,end="')",file=f)
-      print('.',file=f)   
-      
+      print('.',file=f)
+
 # sends edges of the graph to Prolog
 def edges_to_prolog(pref,qgm,f) :
     for ek in qgm.edgesInSent() :
@@ -247,27 +247,27 @@ def facts_to_prolog(pref,name,facts,f) :
     print('.',file=f)
   print('',file=f)
 
-    
+
 # sends the computed ranks to Prolog
 def ranks_to_prolog(pref,qgm,f) :
     ranks=qgm.pagerank()
     facts_to_prolog(pref, 'rank', ranks, f)
 
 
-# sends the words to lemmas table to Prolog      
+# sends the words to lemmas table to Prolog
 def w2l_to_prolog(pref,qgm,f) :
     tuples=qgm.words2lemmas
     for r in tuples :
       print(pref+'w2l',end='',file=f)
       print(r,end='',file=f)
-      print('.',file=f)   
+      print('.',file=f)
 
 # sends svo realtions to Prolog
 def svo_to_prolog(pref,qgm,f) :
     rs=qgm.bestSVOs(100)
     facts_to_prolog(pref, 'svo', rs, f)
-      
-# sends a similarity relation map to Prolog    
+
+# sends a similarity relation map to Prolog
 def sims_to_prolog(pref,gm,qgm,f) :
   #print(qgm.words)
   for qs in qgm.words2lemmas :
@@ -280,7 +280,7 @@ def sims_to_prolog(pref,gm,qgm,f) :
           print((ql,qt,cl,ct),end='',file=f)
           print('.',file=f)
 
-# sends a similarity relation map to Prolog    
+# sends a similarity relation map to Prolog
 def rels_to_prolog(pref,gm,qgm,f) :
   def sentId(touple) :
     return touple[3]
@@ -311,7 +311,7 @@ def rels_to_prolog(pref,gm,qgm,f) :
         rels.add((h,'part_of',ql,-ws[h]))
     for h in holos :
       if h in ws :
-        rels.add((ql,'part_of',h,-ws[h]))  
+        rels.add((ql,'part_of',h,-ws[h]))
   rels=sorted(rels,key=sentId,reverse=True)
   facts_to_prolog(pref,'rel',rels,f)
 
@@ -350,7 +350,7 @@ def personalize_for_query(gm, qgm, sk, wk):
     # print('WORDS',words)
     return (sents, words)
 
-# process a query and send it to Prolog 
+# process a query and send it to Prolog
 def query_to_prolog(text,gm,qgm,fNameNoSuf) :
   qgm.digest(text)
   qfName=fNameNoSuf+'_query'
@@ -372,18 +372,18 @@ def to_prolog(pref,gm,qgm,fNameNoSuf) :
   with open(fNameNoSuf+'.pro','w') as f :
     triples_to_prolog(pref,qgm,f)
     #print(' ',file=f)
-    edges_to_prolog(pref,qgm,f)    
+    edges_to_prolog(pref,qgm,f)
     print(' ',file=f)
-    ranks_to_prolog(pref,qgm,f)  
+    ranks_to_prolog(pref,qgm,f)
     print(' ',file=f)
-    w2l_to_prolog(pref,qgm,f)   
+    w2l_to_prolog(pref,qgm,f)
     print(' ',file=f)
-    sents_to_prolog(pref,qgm,f) 
+    sents_to_prolog(pref,qgm,f)
     print(' ',file=f)
     ners_to_prolog(pref, qgm, f)
     print(' ', file=f)
-    svo_to_prolog(pref,qgm,f)   
-    print(' ',file=f) 
+    svo_to_prolog(pref,qgm,f)
+    print(' ',file=f)
     if pref : # query only
         #sims_to_prolog(pref,gm,qgm,f)
         rels_to_prolog(pref,gm,qgm,f) # should be after svo!
@@ -393,7 +393,7 @@ def to_prolog(pref,gm,qgm,fNameNoSuf) :
 
     else : # document only
         sums_to_prolog(pref,10,qgm,f)
-        print(' ',file=f)  
+        print(' ',file=f)
         keys_to_prolog(pref,10,qgm,f)
         print(' ',file=f)
 
