@@ -1,2 +1,4 @@
 include ./requirements.txt
 include ./deep_talk/*.pro
+include ./deep_talk/*.sh
+
