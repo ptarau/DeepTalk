@@ -1,1 +1,1 @@
-swipl -s qpro.pro
+swipl -s deep_talk/qpro.pro
