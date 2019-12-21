@@ -175,10 +175,12 @@ fabric.properties
 
 examples/*.pro
 examples/*.gv
-examples/*.pro
-examples/*.gv
 examples/*.gv.pdf
+
 pdfs/*.pro
+pdfs/*.gv
+pdfs/*.gv.pdf
+
 test/keys/*
 test/abs/*
 *.gv

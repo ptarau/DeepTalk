@@ -11,20 +11,6 @@ from textcrafts.parser_api import *
 
 ####  start config aprameters ######
 
-# running from other directory -e.g. via a pip install
-def data_files() :
-  #where= "$HOME/Desktop/sit/TEXT_CRAFTS/DeepTalk/"
-  where = './'
-  return where
-#>>> import text_graph_crafts
-#
-#>>> text_graph_crafts.__file__
-# gives
-#...../__init__.py'
-# from here, if qpro.pro is located in the package
-# it can be loaded at runtime
-
-# alternatively, this
 # finds absolute file name of Prolog companion qpro.pro
 def pro() :
   if __name__ == '__main__':
