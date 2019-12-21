@@ -436,12 +436,6 @@ ppp=print
 
 #all_ts()
 
-'''
-todo:
-
-remove: svo(x,rel,x)
-
-'''
 print('prolog companion',pro())
 
 if __name__ == '__main__'  :
