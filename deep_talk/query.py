@@ -1,5 +1,5 @@
-from text_graph_crafts.params import *
-from text_graph_crafts import deepRank as dr
+from textcrafts.params import *
+from textcrafts import deepRank as dr
 from collections import defaultdict
 
 def multi_dict():

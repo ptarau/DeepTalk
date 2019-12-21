@@ -11,11 +11,6 @@ from textcrafts.parser_api import *
 
 ####  start config aprameters ######
 
-# we can change here the toolkit to be used
-
-toolkit='corenlp'
-#toolkit='stanfordnlp'
-
 # running from other directory -e.g. via a pip install
 def data_files() :
   #where= "$HOME/Desktop/sit/TEXT_CRAFTS/DeepTalk/"
@@ -43,16 +38,11 @@ def pro() :
 
 ####  end config aprameters ######
 
+# toolkit, imported from params
 def customGraphMaker() :
-  if toolkit=='stanfordnlp':
-    return dr.GraphMaker(api_classname=StanTorch_API)
-  elif  toolkit=='corenlp' :
-    return dr.GraphMaker(api_classname=CoreNLP_API)
-  else :
-    return None
+    return dr.GraphMaker(api_classname=dr.toolkit)
 
-#from sim import *
-#import eval as ev
+#from dr.sim import *
 
 ## PARAMS for Dialog Engines qpro.py and query.py
 
@@ -196,7 +186,7 @@ def sents_to_prolog(pref, qgm, f):
 
 
 def ners_to_prolog(pref, qgm, f):
-  if toolkit!='corenlp' :
+  if dr.toolkit!='corenlp' :
     return
   s_ws_gen=enumerate(qgm.words())
   for s_ws in s_ws_gen:
@@ -424,27 +414,6 @@ def file2string(fname) :
 def interleave(sep,xs) :
   return interleave_with(sep,None,xs)
 
-def ptest():
-  f = 'examples/bfr'
-  qf = f + '_query.pro'
-  gm = export_to_prolog(f)
-  prolog = Prolog()
-  prolog.consult(f + '.pro')
-  q = prolog.query('listing(dep)')
-  next(q)
-  q.close()
-  qgm = customGraphMaker()
-  query_to_prolog('What is the BFR?', gm, qgm, f)
-  prolog.consult(qf)
-  q = prolog.query('listing(query_sent)')
-  next(q)
-  q.close()
-
-
-def all_ts():
-  for i in range(0, 10):
-    f = 't' + str(i)
-    eval(f + "()")
 
 
 def chat(FNameNoSuf):
@@ -474,88 +443,6 @@ def txt_quest(Folder, FNameNoSuf, QuestFileNoSuf):
   qs = list(file2seq(qfname))
   # print('qs',qs)
   return  dialog_about(Folder + "/" + FNameNoSuf, qs)
-
-
-def q0():
-  d=txt_quest('examples', 'tesla', 'tesla_quest')
-  print('LOG',d)
-
-
-def q1():
-  d=txt_quest('examples', 'bfr', 'bfr_quest')
-  print('LOG',d)
-
-
-
-def t0():
-  dialog_about('examples/tesla',
-               "How I have a flat tire repaired?")
-
-
-def t0a():
-  dialog_about('examples/tesla',
-      "How I have a flat tire repaired?  \
-      Do I have Autopilot enabled? \
-      How I navigate to work? \
-      Should I check tire pressures?")
-
-
-def t1():
-  d=dialog_about('examples/bfr',
-               "What space vehicles SpaceX develops?")
-  print('Sentence IDs: ',d)
-
-
-def t2():
-  # dialog_about('examples/bfr')
-  dialog_about('examples/hindenburg',
-               "When did the  fire start on the Hindenburg?")
-
-
-def t3():
-  dialog_about('examples/const',
-  # "How many votes are needed for the impeachment of a President?"
-        'How can a President be removed from office?'
-  )
-
-
-def t4():
-  dialog_about('examples/summary',
-               "How we obtain summaries and keywords from dependency graphs?")
-
-
-def t5():
-  dialog_about('examples/heaven',
-               "What does the Pope think about heaven?")
-
-
-def t6():
-  dialog_about('examples/einstein',
-               "What does quantum theory tell us about our \
-                description of reality for an observer?")
-
-
-def t7():
-  dialog_about('examples/kafka',
-               # "What does the doorkeeper say about entering?"
-               "Why does K. want access to the law at any price?"
-               )
-
-
-def t8():
-  dialog_about('examples/test',
-               "Does Mary have a book?")
-
-
-def t9():
-  dialog_about('examples/relativity',
-               "What happens to light in the presence of gravitational fields?")
-
-
-def t10():
-  pdf_chat_with('pdfs', 'textrank',
-                about='What are the applications of TextRank? \
-      How sentence extraction works? What is the role of PageRank?')
 
 
 
