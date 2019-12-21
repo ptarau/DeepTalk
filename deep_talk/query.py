@@ -112,9 +112,13 @@ def dialog_about(fname,query=None) :
 def ranked_txt_quest(Folder, FNameNoSuf, QuestFileNoSuf):
   Q = []
   qfname = Folder + "/" + QuestFileNoSuf + ".txt"
-  qs = list(ev.file2seq(qfname))
+  qs = list(file2seq(qfname))
   print('qs',qs)
   dialog_about(Folder+"/"+FNameNoSuf,qs)
+
+def file2seq(fname):
+  with open(fname, 'r') as f:
+    for l in f: yield l.strip()
 
 def t0():
   dialog_about('examples/tesla',

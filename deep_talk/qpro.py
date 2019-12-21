@@ -433,7 +433,7 @@ def pdf_chat_with(Folder, FNameNoSuf, about=None):
 def pdf_quest(Folder, FNameNoSuf, QuestFileNoSuf):
   Q = []
   qfname = Folder + "/" + QuestFileNoSuf + ".txt"
-  qs = list(ev.file2seq(qfname))
+  qs = list(file2seq(qfname))
   return  pdf_chat_with(Folder, FNameNoSuf, about=qs)
 
 
