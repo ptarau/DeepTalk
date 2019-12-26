@@ -142,6 +142,7 @@ def sink(generator) :
 
 def getNERs(ws):
   from nltk.parse.corenlp import CoreNLPParser
+  from textcrafts.corenlp_api import parserURL
   parser = CoreNLPParser(url=parserURL, tagtype='ner')
   ts = parser.tag(ws)
   for t in ts :
@@ -172,8 +173,10 @@ def sents_to_prolog(pref, qgm, f):
 
 
 def ners_to_prolog(pref, qgm, f):
-  if dr.toolkit!='corenlp' :
+
+  if not corenlp :
     return
+  print("GENERATING NERS")
   s_ws_gen=enumerate(qgm.words())
   for s_ws in s_ws_gen:
     s,ws=s_ws
