@@ -2,12 +2,14 @@ from pyswip import *
 from pyswip.easy import *
 from graphviz import Digraph
 import subprocess
-from textcrafts.params import *
+
 
 from textcrafts import deepRank as dr
 from textcrafts.sim import *
 from textcrafts.parser_api import *
 
+
+#from textcrafts.params import *
 
 ####  start config aprameters ######
 
@@ -26,7 +28,7 @@ def pro() :
 
 # toolkit, imported from params
 def customGraphMaker() :
-    return dr.GraphMaker(api_classname=dr.toolkit)
+    return dr.GraphMaker(params=dr.params)
 
 #from dr.sim import *
 
@@ -172,9 +174,9 @@ def sents_to_prolog(pref, qgm, f):
 
 
 
-def ners_to_prolog(pref, qgm, f):
+def ners_to_prolog(pref, qgm, f,params=dr.params):
 
-  if not corenlp :
+  if not params.corenlp :
     return
   print("GENERATING NERS")
   s_ws_gen=enumerate(qgm.words())
@@ -205,7 +207,7 @@ def keys_to_prolog(pref,k,qgm,f) :
       print('.',file=f)
 
 # sends edges of the graph to Prolog
-def edges_to_prolog(pref,qgm,f) :
+def edges_to_prolog(pref,qgm,f,pics) :
     for ek in qgm.edgesInSent() :
       e,k=ek
       a,aa,r,b,bb=e
@@ -347,11 +349,11 @@ def personalized_to_prolog(pref,gm,qgm,personalize,f) :
 # small files are used that the pyswip activated Prolog will answer
 # the pref='query_' marks file names with query_, while
 # the empty prefix pref='' marks realtions describing a document
-def to_prolog(pref,gm,qgm,fNameNoSuf) :
+def to_prolog(pref,gm,qgm,fNameNoSuf,pics=dr.params.pics) :
   with open(fNameNoSuf+'.pro','w') as f :
     triples_to_prolog(pref,qgm,f)
     #print(' ',file=f)
-    edges_to_prolog(pref,qgm,f)
+    edges_to_prolog(pref,qgm,f,pics)
     print(' ',file=f)
     ranks_to_prolog(pref,qgm,f)
     print(' ',file=f)
