@@ -3,13 +3,26 @@ from pyswip.easy import *
 from graphviz import Digraph
 import subprocess
 
-
 from textcrafts import deepRank as dr
 from textcrafts.sim import *
 from textcrafts.parser_api import *
 
 
-#from textcrafts.params import *
+## PARAMS for Dialog Engines qpro.py and query.py
+
+class talk_params(dr.craft_params):
+  def __init__(self):
+    super().__init__()
+    self.corenlp = True
+    self.quiet = True
+    self.summarize = True
+    self.quest_memory = 1
+    self.max_answers = 3
+    self.repeat_answers = 'yes'
+    self.by_rank = 'yes'
+    self.personalize = 50
+
+params=talk_params()
 
 ####  start config aprameters ######
 
@@ -26,25 +39,10 @@ def pro() :
 
 ####  end config aprameters ######
 
-# toolkit, imported from params
-def customGraphMaker() :
-    return dr.GraphMaker(params=dr.params)
-
-#from dr.sim import *
-
-## PARAMS for Dialog Engines qpro.py and query.py
-
-quiet=True
-summarize=True
-quest_memory=1
-max_answers=3
-repeat_answers='yes'
-by_rank='yes'
-personalize=50
 
 def say(what) :
   print(what)
-  if not quiet : subprocess.run(["say", what])
+  if not params.quiet : subprocess.run(["say", what])
 
 def go() :
   #fNameNoSuf='examples/relativity'
@@ -67,13 +65,13 @@ def gen_pro_dataset() :
     export_to_prolog(txtf,prof)
 
 # interactive dialog
-def talk_about(fNameNoSuf):
-  return dialog_about(fNameNoSuf,None)
+def talk_about(fNameNoSuf,params=params):
+  return dialog_about(fNameNoSuf,None,params=params)
 
-def dialog_about(fNameNoSuf,question) :
-  gm=export_to_prolog(fNameNoSuf)
+def dialog_about(fNameNoSuf,question,params=params) :
+  gm=export_to_prolog(fNameNoSuf,params=params)
 
-  if summarize :
+  if params.summarize :
     wk,vk,sk = 6,6,3
     dr.print_keys(gm.bestWords(wk))
     dr.print_rels(gm.bestSVOs(vk))
@@ -83,23 +81,23 @@ def dialog_about(fNameNoSuf,question) :
   prolog = Prolog()
   sink(prolog.query("consult('" + pro() + "')"))
   sink(prolog.query("load('"+fNameNoSuf+"')"))
-  qgm=customGraphMaker()
+  qgm=dr.GraphMaker(params=params)
 
   M = []
   log=[]
   if isinstance(question,list):
     for q in question :
       say(q)
-      process_quest(prolog,q, M, gm, qgm, fNameNoSuf,log)
+      process_quest(prolog,q, M, gm, qgm, fNameNoSuf,log,params=params)
   elif question :
     say(question)
     print('')
-    dialog_step(prolog,question,gm,qgm,fNameNoSuf,log)
+    dialog_step(prolog,question,gm,qgm,fNameNoSuf,log,params=params)
   else :
     while(True) :
       question=input('?-- ')
       if not question : break
-      process_quest(prolog,question, M, gm, qgm, fNameNoSuf,log)
+      process_quest(prolog,question, M, gm, qgm, fNameNoSuf,log,params=params)
   return process_log(log)
 
 def process_log(log) :
@@ -113,21 +111,21 @@ def process_log(log) :
     qa_log[i]=ls
   return qa_log
 
-def process_quest(prolog,question,M,gm,qgm,fNameNoSuf,log) :
+def process_quest(prolog,question,M,gm,qgm,fNameNoSuf,log,params=params) :
   question = question + ' '
   if question in M:
     i = M.index(question)
     M.pop(i)
   M.append(question)
-  if quest_memory>0 : M=M[-quest_memory:]
+  if params.quest_memory>0 : M=M[-params.quest_memory:]
   Q=reversed(M)
   question = ''.join(Q)
-  dialog_step(prolog, question, gm, qgm, fNameNoSuf,log)
+  dialog_step(prolog, question, gm, qgm, fNameNoSuf,log,params=params)
 
 
 # step in a dialog agent based given file and question
-def dialog_step(prolog,question,gm,qgm,fNameNoSuf,log) :
-    query_to_prolog(question,gm,qgm,fNameNoSuf)
+def dialog_step(prolog,question,gm,qgm,fNameNoSuf,log,params=params) :
+    query_to_prolog(question,gm,qgm,fNameNoSuf,params=params)
     rs=prolog.query("ask('" + fNameNoSuf + "'"  + ",Key)")
     answers=[pair['Key'] for pair in rs]
     log.append((question,answers))
@@ -174,11 +172,11 @@ def sents_to_prolog(pref, qgm, f):
 
 
 
-def ners_to_prolog(pref, qgm, f,params=dr.params):
+def ners_to_prolog(pref, qgm, f):
 
   if not params.corenlp :
     return
-  print("GENERATING NERS")
+  #print("GENERATING NERS")
   s_ws_gen=enumerate(qgm.words())
   for s_ws in s_ws_gen:
     s,ws=s_ws
@@ -207,7 +205,7 @@ def keys_to_prolog(pref,k,qgm,f) :
       print('.',file=f)
 
 # sends edges of the graph to Prolog
-def edges_to_prolog(pref,qgm,f,pics) :
+def edges_to_prolog(pref,qgm,f) :
     for ek in qgm.edgesInSent() :
       e,k=ek
       a,aa,r,b,bb=e
@@ -215,7 +213,7 @@ def edges_to_prolog(pref,qgm,f,pics) :
       print(pref+'edge',end='',file=f)
       print(e,end='',file=f)
       print('.',file=f)
-    if pics=='yes' and pref :
+    if params.show and pref :
       dr.query_edges_to_dot(qgm)
 
 # generic Prolog predicate maker
@@ -298,20 +296,20 @@ def rels_to_prolog(pref,gm,qgm,f) :
 
 # exporting to Prolog files needed to answer query
 
-def export_to_prolog(fNameNoSuf,OutF=None) :
-  gm=customGraphMaker()
+def export_to_prolog(fNameNoSuf,OutF=None,params=params) :
+  gm=dr.GraphMaker(params=params)
   gm.load(fNameNoSuf+'.txt')
   if not OutF :
     OutF = fNameNoSuf
-  to_prolog('',gm,gm,OutF)
+  to_prolog('',gm,gm,OutF,params=params)
   return gm
 
-def params_to_prolog(pref,f) :
-  rels=[('quest_memory',quest_memory),
-        ('max_answers', max_answers),
-        ('repeat_answers',repeat_answers),
-        ('personalize',personalize),
-        ('by_rank', by_rank)
+def params_to_prolog(pref,f,params=params) :
+  rels=[('quest_memory',params.quest_memory),
+        ('max_answers', params.max_answers),
+        ('repeat_answers',params.repeat_answers),
+        ('personalize',params.personalize),
+        ('by_rank', params.by_rank)
         ]
   facts_to_prolog(pref, 'param', rels, f)
 
@@ -332,10 +330,10 @@ def personalize_for_query(gm, qgm, sk, wk):
     return (sents, words)
 
 # process a query and send it to Prolog
-def query_to_prolog(text,gm,qgm,fNameNoSuf) :
+def query_to_prolog(text,gm,qgm,fNameNoSuf,params=params) :
   qgm.digest(text)
   qfName=fNameNoSuf+'_query'
-  to_prolog('query_',gm,qgm,qfName)
+  to_prolog('query_',gm,qgm,qfName,params=params)
 
 def personalized_to_prolog(pref,gm,qgm,personalize,f) :
   count=personalize
@@ -349,11 +347,12 @@ def personalized_to_prolog(pref,gm,qgm,personalize,f) :
 # small files are used that the pyswip activated Prolog will answer
 # the pref='query_' marks file names with query_, while
 # the empty prefix pref='' marks realtions describing a document
-def to_prolog(pref,gm,qgm,fNameNoSuf,pics=dr.params.pics) :
+def to_prolog(pref,gm,qgm,fNameNoSuf,params=params) :
+  print('\n\nPARAMS !!!', params, params.max_answers)
   with open(fNameNoSuf+'.pro','w') as f :
     triples_to_prolog(pref,qgm,f)
     #print(' ',file=f)
-    edges_to_prolog(pref,qgm,f,pics)
+    edges_to_prolog(pref,qgm,f)
     print(' ',file=f)
     ranks_to_prolog(pref,qgm,f)
     print(' ',file=f)
@@ -368,9 +367,9 @@ def to_prolog(pref,gm,qgm,fNameNoSuf,pics=dr.params.pics) :
     if pref : # query only
         #sims_to_prolog(pref,gm,qgm,f)
         rels_to_prolog(pref,gm,qgm,f) # should be after svo!
-        if personalize>0 :
-           personalized_to_prolog(pref,gm,qgm,personalize,f)
-        params_to_prolog(pref, f)
+        if params.personalize>0 :
+           personalized_to_prolog(pref,gm,qgm,params.personalize,f)
+        params_to_prolog(pref, f,params=params)
 
     else : # document only
         sums_to_prolog(pref,10,qgm,f)
@@ -411,29 +410,29 @@ def chat(FNameNoSuf):
   return dialog_about('examples/' + FNameNoSuf, None)
 
 
-def pdf_chat(FNameNoSuf):
-  return  pdf_chat_with("pdfs", FNameNoSuf)
+def pdf_chat(FNameNoSuf,params=params):
+  return  pdf_chat_with("pdfs", FNameNoSuf,params=params)
 
 
-def pdf_chat_with(Folder, FNameNoSuf, about=None):
+def pdf_chat_with(Folder, FNameNoSuf, about=None,params=params):
   fname = Folder + "/" + FNameNoSuf
   dr.pdf2txt(fname + ".pdf")
-  return  dialog_about(fname, about)
+  return  dialog_about(fname, about,params=params)
 
 
-def pdf_quest(Folder, FNameNoSuf, QuestFileNoSuf):
+def pdf_quest(Folder, FNameNoSuf, QuestFileNoSuf,params=params):
   Q = []
   qfname = Folder + "/" + QuestFileNoSuf + ".txt"
   qs = list(file2seq(qfname))
-  return  pdf_chat_with(Folder, FNameNoSuf, about=qs)
+  return  pdf_chat_with(Folder, FNameNoSuf, about=qs,params=params)
 
 
-def txt_quest(Folder, FNameNoSuf, QuestFileNoSuf):
+def txt_quest(Folder, FNameNoSuf, QuestFileNoSuf,params=params):
   Q = []
   qfname = Folder + "/" + QuestFileNoSuf + ".txt"
   qs = list(file2seq(qfname))
   # print('qs',qs)
-  return  dialog_about(Folder + "/" + FNameNoSuf, qs)
+  return  dialog_about(Folder + "/" + FNameNoSuf, qs,params=params)
 
 
 

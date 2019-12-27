@@ -10,7 +10,7 @@ def ptest():
   q = prolog.query('listing(dep)')
   next(q)
   q.close()
-  qgm = customGraphMaker()
+  qgm = GraphMaker(params=params)
   query_to_prolog('What is the BFR?', gm, qgm, f)
   prolog.consult(qf)
   q = prolog.query('listing(query_sent)')
