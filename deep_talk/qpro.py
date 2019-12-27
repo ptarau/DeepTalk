@@ -348,7 +348,6 @@ def personalized_to_prolog(pref,gm,qgm,personalize,f) :
 # the pref='query_' marks file names with query_, while
 # the empty prefix pref='' marks realtions describing a document
 def to_prolog(pref,gm,qgm,fNameNoSuf,params=params) :
-  print('\n\nPARAMS !!!', params, params.max_answers)
   with open(fNameNoSuf+'.pro','w') as f :
     triples_to_prolog(pref,qgm,f)
     #print(' ',file=f)
