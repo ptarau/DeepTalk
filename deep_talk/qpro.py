@@ -72,12 +72,7 @@ def dialog_about(fNameNoSuf,question,params=params) :
   gm=export_to_prolog(fNameNoSuf,params=params)
 
   if params.summarize :
-    wk,vk,sk = 6,6,3
-    dr.print_keys(gm.bestWords(wk))
-    dr.print_rels(gm.bestSVOs(vk))
-    print('SUMMARY')
-    dr.print_summary(gm.bestSentences(sk))
-
+    print(gm)
   prolog = Prolog()
   sink(prolog.query("consult('" + pro() + "')"))
   sink(prolog.query("load('"+fNameNoSuf+"')"))
