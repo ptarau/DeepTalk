@@ -104,3 +104,7 @@ def all_ts():
   for i in range(0, 10):
     f = 't' + str(i)
     eval(f + "()")
+
+def qtests() :
+  from deep_talk.query import t1
+  t1()
