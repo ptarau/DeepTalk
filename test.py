@@ -99,6 +99,9 @@ def t10():
                 about='What are the applications of TextRank? \
       How sentence extraction works? What is the role of PageRank?')
 
+def t11():
+  d=txt_quest('examples', 'texas', 'texas_quest')
+  print('LOG',d)
 
 def all_ts():
   for i in range(0, 10):
