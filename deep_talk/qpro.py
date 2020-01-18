@@ -21,6 +21,8 @@ class talk_params(dr.craft_params):
     self.repeat_answers = 'yes'
     self.by_rank = 'yes'
     self.personalize = 50
+    self.show=True
+    self.cloud=36
 
 params=talk_params()
 
@@ -70,6 +72,7 @@ def talk_about(fNameNoSuf,params=params):
 
 def dialog_about(fNameNoSuf,question,params=params) :
   gm=export_to_prolog(fNameNoSuf,params=params)
+  if params.show: gm.kshow(params.cloud,file_name="cloud.pdf",show=True)
 
   if params.summarize :
     print(gm)
@@ -77,6 +80,7 @@ def dialog_about(fNameNoSuf,question,params=params) :
   sink(prolog.query("consult('" + pro() + "')"))
   sink(prolog.query("load('"+fNameNoSuf+"')"))
   qgm=dr.GraphMaker(params=params)
+
 
   M = []
   log=[]
@@ -311,6 +315,7 @@ def params_to_prolog(pref,f,params=params) :
 def personalize_for_query(gm, qgm, sk, wk):
     query_dict = dr.pers_dict(qgm)
     ranks = gm.rerank(query_dict)
+    if params.show: gm.kshow(params.cloud, file_name="quest_cloud.pdf", show=True)
 
     def ranked(xs):
       # return xs
