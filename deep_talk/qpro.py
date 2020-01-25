@@ -403,6 +403,15 @@ def file2string(fname) :
 def interleave(sep,xs) :
   return interleave_with(sep,None,xs)
 
+def pos2tag(pos) :
+  if not pos :
+    return None
+  c=pos[0]
+  if c is 'N' : return 'n'
+  elif c is 'V' : return 'v'
+  elif c is 'J' : return 'a'
+  elif c is 'R' : return 'r'
+  else : return None
 
 
 def chat(FNameNoSuf):
