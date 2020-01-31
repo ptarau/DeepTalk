@@ -1,5 +1,6 @@
 import os
 from deep_talk.qpro import *
+from deep_talk.query import qgo
 
 def ptest():
   f = 'examples/bfr'
